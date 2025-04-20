@@ -1,3 +1,5 @@
+/* this is imitation of real word data that was provided in a interview  */
+
 select *
 from apptsettlers.branchoffice;
 
