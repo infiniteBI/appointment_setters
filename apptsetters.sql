@@ -1,5 +1,3 @@
-/* this is imitation of real word data that was provided in a interview  */
-
 select *
 from apptsettlers.branchoffice;
 
@@ -99,3 +97,51 @@ from apptsettlers.employee e
     join apptsettlers.branchoffice o on  o.office_id = a.office_id
 group by e.Supervisor, o.location
 order by total_appt desc
+
+-- let's see appointment's type by location
+WITH appt_total AS (
+					select 
+						o.location, a.appt_type,
+							count(a.appt_type) over(partition by o.location,a.appt_type) as total_appt
+					from apptsettlers.branchoffice o 
+						join apptsettlers.appointments a on  o.office_id = a.office_id
+)
+
+select location, appt_type, total_appt
+from appt_total
+group by location, appt_type, total_appt
+order by total_appt desc;
+
+-- Let's see the most appointment by location
+
+WITH location_appt_counts AS (
+    SELECT
+        o.location,
+        a.appt_type,
+        COUNT(a.appt_type) AS total_appt
+    FROM
+        apptsettlers.branchoffice o
+    JOIN
+        apptsettlers.appointments a ON o.office_id = a.office_id
+    GROUP BY
+        o.location, a.appt_type
+),
+ranked_locations AS (
+    SELECT
+        location,
+        appt_type,
+        total_appt,
+        RANK() OVER (PARTITION BY location ORDER BY total_appt DESC) as rank_num
+    FROM
+        location_appt_counts
+)
+SELECT
+    location,
+    appt_type,
+    total_appt
+FROM
+    ranked_locations
+WHERE
+    rank_num = 1
+ORDER BY
+    location;
