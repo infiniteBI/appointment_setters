@@ -135,10 +135,9 @@ ranked_locations AS (
     FROM
         location_appt_counts
 )
+	
 SELECT
-    location,
-    appt_type,
-    total_appt
+    location, appt_type, total_appt
 FROM
     ranked_locations
 WHERE
